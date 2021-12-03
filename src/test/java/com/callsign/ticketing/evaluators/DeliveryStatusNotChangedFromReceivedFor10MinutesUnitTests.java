@@ -2,6 +2,7 @@ package com.callsign.ticketing.evaluators;
 
 import com.callsign.ticketing.data.entities.Delivery;
 import com.callsign.ticketing.data.enums.DeliveryStatus;
+import com.callsign.ticketing.data.transactions.businesslayer.DeliveryRecord;
 import com.callsign.ticketing.tickets.DeliveryStatusNotChangedFromReceivedFor10Minutes;
 import org.junit.Assert;
 import org.junit.Test;
@@ -9,7 +10,7 @@ import org.junit.Test;
 import java.time.LocalDateTime;
 
 public class DeliveryStatusNotChangedFromReceivedFor10MinutesUnitTests {
-  private static Delivery delivery = new Delivery();
+  private static DeliveryRecord delivery = new DeliveryRecord();
   private static DeliveryStatusNotChangedFromReceivedFor10Minutes evaluator =
       new DeliveryStatusNotChangedFromReceivedFor10Minutes();
 

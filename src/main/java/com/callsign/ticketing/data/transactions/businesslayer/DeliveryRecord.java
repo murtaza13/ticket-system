@@ -1,61 +1,48 @@
-package com.callsign.ticketing.data.entities;
+package com.callsign.ticketing.data.transactions.businesslayer;
 
+import com.callsign.ticketing.data.entities.Restaurant;
+import com.callsign.ticketing.data.entities.Ticket;
 import com.callsign.ticketing.data.enums.CustomerType;
 import com.callsign.ticketing.data.enums.DeliveryStatus;
 
-import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
-@Entity
-@Table(name = "delivery")
-public class Delivery {
-  @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
-  @Column(name = "delivery_id")
+public class DeliveryRecord {
   private Long deliveryId;
-
-  @Column(name = "customer_type", columnDefinition = "ENUM('VIP', 'LOYAL', 'NEW')")
-  @Enumerated(EnumType.STRING)
   private CustomerType customerType;
-
-  @Column(name = "delivery_status", columnDefinition = "ENUM('RECEIVED','PREPARING', 'PICKED_UP', 'DELIVERED')")
-  @Enumerated(EnumType.STRING)
   private DeliveryStatus deliveryStatus;
-
-  @Column(name = "current_distance_from_destination_in_metres")
   private Integer currentDistanceFromDestinationInMetres;
-
-  @Column(name = "expected_delivery_time")
   private LocalDateTime expectedDeliveryTime;
-
-  @Column(name = "time_to_reach_destination_in_seconds")
   private Integer timeToReachDestinationInSeconds;
-
-  @Column(name = "created_at")
   private LocalDateTime createdAt;
+  private int restaurantsMeanTimetoPrepareFood;
+  private List<TicketRecord> tickets = new ArrayList<>();
 
-  @ManyToOne
-  @JoinColumn(name = "restaurant_id", referencedColumnName = "restaurant_id")
-  private Restaurant restaurant;
-
-  @OneToMany(mappedBy = "delivery")
-  private List<Ticket> tickets = new ArrayList<>();
-
-  public Delivery() {
+  public DeliveryRecord() {
   }
 
-  public Delivery(CustomerType customerType, DeliveryStatus deliveryStatus,
-                  Integer currentDistanceFromDestinationInMetres, LocalDateTime expectedDeliveryTime,
-                  Integer timeToReachDestinationInSeconds, LocalDateTime createdAt, Restaurant restaurant) {
+  //Added for better testability
+  public DeliveryRecord(Long deliveryId) {
+    this.deliveryId = deliveryId;
+  }
+
+  public DeliveryRecord(Long deliveryId, CustomerType customerType, DeliveryStatus deliveryStatus,
+                        Integer currentDistanceFromDestinationInMetres, LocalDateTime expectedDeliveryTime,
+                        Integer timeToReachDestinationInSeconds, LocalDateTime createdAt,
+                        int restaurantsMeanTimetoPrepareFood, List<TicketRecord> tickets) {
+    this.deliveryId = deliveryId;
     this.customerType = customerType;
     this.deliveryStatus = deliveryStatus;
     this.currentDistanceFromDestinationInMetres = currentDistanceFromDestinationInMetres;
     this.expectedDeliveryTime = expectedDeliveryTime;
     this.timeToReachDestinationInSeconds = timeToReachDestinationInSeconds;
     this.createdAt = createdAt;
-    this.restaurant = restaurant;
+    this.restaurantsMeanTimetoPrepareFood = restaurantsMeanTimetoPrepareFood;
+    this.tickets = tickets;
   }
 
   public Long getDeliveryId() {
@@ -114,19 +101,19 @@ public class Delivery {
     this.createdAt = createdAt;
   }
 
-  public Restaurant getRestaurant() {
-    return restaurant;
+  public int getRestaurantsMeanTimetoPrepareFood() {
+    return restaurantsMeanTimetoPrepareFood;
   }
 
-  public void setRestaurant(Restaurant restaurant) {
-    this.restaurant = restaurant;
+  public void setRestaurantsMeanTimetoPrepareFood(int restaurantsMeanTimetoPrepareFood) {
+    this.restaurantsMeanTimetoPrepareFood = restaurantsMeanTimetoPrepareFood;
   }
 
-  public List<Ticket> getTickets() {
+  public List<TicketRecord> getTickets() {
     return tickets;
   }
 
-  public void setTickets(List<Ticket> tickets) {
+  public void setTickets(List<TicketRecord> tickets) {
     this.tickets = tickets;
   }
 }
