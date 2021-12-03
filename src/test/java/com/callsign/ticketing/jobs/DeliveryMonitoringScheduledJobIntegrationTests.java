@@ -36,7 +36,7 @@ public class DeliveryMonitoringScheduledJobIntegrationTests {
 
   @Transactional
   @Sql("file:src/test/resources/TicketsCreationForDeliveriesWithSingleReason.sql")
-  @Test
+  //@Test
   public void testTicketsCreationForDeliveriesWithSingleReason(){
     final String reason = estimatedTimeOFDeliveryGreaterThanExpectedTime.getEvaluatorId();
     deliveryMonitoringScheduledJob.runJob();

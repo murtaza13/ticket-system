@@ -3,6 +3,7 @@ package com.callsign.ticketing.tickets;
 import com.callsign.ticketing.data.entities.Delivery;
 import com.callsign.ticketing.data.enums.DeliveryStatus;
 import com.callsign.ticketing.data.enums.TicketPriority;
+import com.callsign.ticketing.data.transactions.businesslayer.DeliveryRecord;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
@@ -15,7 +16,7 @@ public class DeliveryStatusNotChangedFromReceivedFor10Minutes implements TicketC
   }
 
   @Override
-  public boolean evaluate(Delivery delivery) {
+  public boolean evaluate(DeliveryRecord delivery) {
     return LocalDateTime.now().isAfter(delivery.getCreatedAt().plusMinutes(10)) &&
         delivery.getDeliveryStatus().equals(DeliveryStatus.RECEIVED);
   }

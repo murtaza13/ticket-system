@@ -1,11 +1,10 @@
 package com.callsign.ticketing.jobs;
 
 import com.callsign.ticketing.configurations.EmptyContext;
-import com.callsign.ticketing.data.entities.Delivery;
-import com.callsign.ticketing.data.entities.Restaurant;
 import com.callsign.ticketing.data.enums.CustomerType;
 import com.callsign.ticketing.data.enums.DeliveryStatus;
 import com.callsign.ticketing.data.enums.TicketPriority;
+import com.callsign.ticketing.data.transactions.businesslayer.DeliveryRecord;
 import com.callsign.ticketing.services.DeliveryService;
 import com.callsign.ticketing.services.TicketService;
 import com.callsign.ticketing.tickets.DeliveryStatusNotChangedFromReceivedFor10Minutes;
@@ -15,24 +14,20 @@ import com.callsign.ticketing.tickets.TicketConditionEvaluator;
 import mockit.Expectations;
 import mockit.Mocked;
 import mockit.Verifications;
-import org.junit.Before;
 import org.junit.Test;
 import org.springframework.context.ApplicationContext;
 import org.springframework.test.context.ContextConfiguration;
 
 import java.time.LocalDateTime;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
+import java.util.*;
 
-@ContextConfiguration(classes = {EmptyContext.class} )
+@ContextConfiguration(classes = {EmptyContext.class})
 public class DeliveryMonitoringScheduledJobUnitTests {
 
   @Test
   public void testNoDeliveriesCreateNoTickets(@Mocked DeliveryService deliveryService, @Mocked TicketService ticketService,
-                       @Mocked ApplicationContext applicationContext){
-    new Expectations(){{
+                                              @Mocked ApplicationContext applicationContext) {
+    new Expectations() {{
       deliveryService.getNInCompleteDeliveries(anyInt);
       result = new HashSet<>();
     }};
@@ -47,29 +42,22 @@ public class DeliveryMonitoringScheduledJobUnitTests {
 
     deliveryMonitoringScheduledJob.runJob();
 
-    new Verifications(){{
-      ticketService.createTicket(anyString, (TicketPriority) any, anyLong); times = 0;
+    new Verifications() {{
+      ticketService.createTicket(anyString, (TicketPriority) any, anyLong);
+      times = 0;
     }};
   }
 
   @Test
   public void testSingleDeliveryButNotQualifiedCreateNoTickets(@Mocked DeliveryService deliveryService,
-                                                                 @Mocked TicketService ticketService,
-                                                                 @Mocked ApplicationContext applicationContext){
-    Delivery delivery = new Delivery(
-        CustomerType.VIP,
-        DeliveryStatus.RECEIVED,
-        100,
-        LocalDateTime.now().plusSeconds(1000),
-        100,
-        LocalDateTime.now(),
-        new Restaurant(100)
-     );
+                                                               @Mocked TicketService ticketService,
+                                                               @Mocked ApplicationContext applicationContext) {
+    DeliveryRecord deliveryRecord = getDeliveryRecord(100, 100,
+        100, LocalDateTime.now().plusSeconds(1000));
 
-
-    new Expectations(){{
+    new Expectations() {{
       deliveryService.getNInCompleteDeliveries(anyInt);
-      result = Collections.singleton(delivery);
+      result = Collections.singleton(deliveryRecord);
     }};
 
     setApplicationContextExpectation(applicationContext);
@@ -82,28 +70,22 @@ public class DeliveryMonitoringScheduledJobUnitTests {
 
     deliveryMonitoringScheduledJob.runJob();
 
-    new Verifications(){{
-      ticketService.createTicket(anyString, (TicketPriority) any, anyLong); times = 0;
+    new Verifications() {{
+      ticketService.createTicket(anyString, (TicketPriority) any, anyLong);
+      times = 0;
     }};
   }
 
   @Test
   public void testSingleDeliveryButQualifiedForSingleReasonSingleTicketCreated(@Mocked DeliveryService deliveryService,
                                                                                @Mocked TicketService ticketService,
-                                                                               @Mocked ApplicationContext applicationContext){
-    Delivery delivery = new Delivery(
-        CustomerType.VIP,
-        DeliveryStatus.RECEIVED,
-        100,
-        LocalDateTime.now().plusSeconds(100),
-        100,
-        LocalDateTime.now(),
-        new Restaurant(100)
-    );
+                                                                               @Mocked ApplicationContext applicationContext) {
+    DeliveryRecord deliveryRecord = getDeliveryRecord(100, 100,
+        100, LocalDateTime.now().plusSeconds(100));
 
-    new Expectations(){{
+    new Expectations() {{
       deliveryService.getNInCompleteDeliveries(anyInt);
-      result = Collections.singleton(delivery);
+      result = Collections.singleton(deliveryRecord);
     }};
 
     setApplicationContextExpectation(applicationContext);
@@ -116,12 +98,28 @@ public class DeliveryMonitoringScheduledJobUnitTests {
 
     deliveryMonitoringScheduledJob.runJob();
 
-    new Verifications(){{
-      ticketService.createTicket(anyString, (TicketPriority) any, anyLong); times = 1;
+    new Verifications() {{
+      ticketService.createTicket(anyString, (TicketPriority) any, anyLong);
+      times = 1;
     }};
   }
 
-  private void setApplicationContextExpectation(ApplicationContext applicationContext){
+  private DeliveryRecord getDeliveryRecord(int currentDistanceFromDestination, int secondsToReachDestination,
+                                           int restaurantsMeanTimeToPrepareFood, LocalDateTime expectedDeliveryTime) {
+    DeliveryRecord deliveryRecord = new DeliveryRecord();
+    deliveryRecord.setDeliveryId(1L);
+    deliveryRecord.setCustomerType(CustomerType.VIP);
+    deliveryRecord.setDeliveryStatus(DeliveryStatus.RECEIVED);
+    deliveryRecord.setCurrentDistanceFromDestinationInMetres(currentDistanceFromDestination);
+    deliveryRecord.setTimeToReachDestinationInSeconds(secondsToReachDestination);
+    deliveryRecord.setRestaurantsMeanTimetoPrepareFood(restaurantsMeanTimeToPrepareFood);
+    deliveryRecord.setExpectedDeliveryTime(expectedDeliveryTime);
+    deliveryRecord.setCreatedAt(LocalDateTime.now());
+    deliveryRecord.setTickets(new ArrayList<>());
+    return deliveryRecord;
+  }
+
+  private void setApplicationContextExpectation(ApplicationContext applicationContext) {
     Map<String, TicketConditionEvaluator> map = new HashMap<>();
     map.put(EstimatedTimeOFDeliveryGreaterThanExpectedTime.class.getName(),
         new EstimatedTimeOFDeliveryGreaterThanExpectedTime());
@@ -129,9 +127,9 @@ public class DeliveryMonitoringScheduledJobUnitTests {
         new DeliveryStatusNotChangedFromReceivedFor10Minutes());
     map.put(ExpectedTimeOfDeliveryPassedTicketConditionEvaluator.class.getName(),
         new ExpectedTimeOfDeliveryPassedTicketConditionEvaluator());
-     new Expectations(){{
-       applicationContext.getBeansOfType(TicketConditionEvaluator.class);
-       result = map;
-     }};
+    new Expectations() {{
+      applicationContext.getBeansOfType(TicketConditionEvaluator.class);
+      result = map;
+    }};
   }
 }

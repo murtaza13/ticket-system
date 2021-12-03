@@ -2,6 +2,7 @@ package com.callsign.ticketing.evaluators;
 
 import com.callsign.ticketing.data.entities.Delivery;
 import com.callsign.ticketing.data.entities.Restaurant;
+import com.callsign.ticketing.data.transactions.businesslayer.DeliveryRecord;
 import com.callsign.ticketing.tickets.EstimatedTimeOFDeliveryGreaterThanExpectedTime;
 import com.callsign.ticketing.tickets.ExpectedTimeOfDeliveryPassedTicketConditionEvaluator;
 import org.junit.Assert;
@@ -10,14 +11,11 @@ import org.junit.Test;
 import java.time.LocalDateTime;
 
 public class EstimatedTimeOfDeliveryGreaterThanExpectedTimeUnitTests {
-  private static Delivery delivery;
+  private static DeliveryRecord delivery;
 
   static {
-    Restaurant restaurant =  new Restaurant();
-    restaurant.setMeanTimeToPrepareFoodInSeconds(100);
-
-    delivery = new Delivery();
-    delivery.setRestaurant(restaurant);
+    delivery = new DeliveryRecord();
+    delivery.setRestaurantsMeanTimetoPrepareFood(100);
     delivery.setCreatedAt(LocalDateTime.now());
   }
 

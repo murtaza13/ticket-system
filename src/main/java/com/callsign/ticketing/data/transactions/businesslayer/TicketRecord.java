@@ -1,19 +1,27 @@
-package com.callsign.ticketing.data.transactions;
+package com.callsign.ticketing.data.transactions.businesslayer;
 
-import com.callsign.ticketing.data.entities.Delivery;
 import com.callsign.ticketing.data.enums.TicketPriority;
 
 public class TicketRecord {
   private Long ticketId;
   private String reason;
   private TicketPriority ticketPriority;
-  private Delivery delivery;
+  private DeliveryRecord deliveryRecord;
 
-  public TicketRecord(Long ticketId, String reason, TicketPriority ticketPriority, Delivery delivery) {
+  public TicketRecord() {
+  }
+
+  public TicketRecord(Long ticketId, String reason, TicketPriority ticketPriority) {
     this.ticketId = ticketId;
     this.reason = reason;
     this.ticketPriority = ticketPriority;
-    this.delivery = delivery;
+  }
+
+  public TicketRecord(Long ticketId, String reason, TicketPriority ticketPriority, DeliveryRecord deliveryRecord) {
+    this.ticketId = ticketId;
+    this.reason = reason;
+    this.ticketPriority = ticketPriority;
+    this.deliveryRecord = deliveryRecord;
   }
 
   public Long getTicketId() {
@@ -40,11 +48,11 @@ public class TicketRecord {
     this.ticketPriority = ticketPriority;
   }
 
-  public Delivery getDelivery() {
-    return delivery;
+  public DeliveryRecord getDeliveryRecord() {
+    return deliveryRecord;
   }
 
-  public void setDelivery(Delivery delivery) {
-    this.delivery = delivery;
+  public void setDeliveryRecord(DeliveryRecord deliveryRecord) {
+    this.deliveryRecord = deliveryRecord;
   }
 }
