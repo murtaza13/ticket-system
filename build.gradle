@@ -1,0 +1,60 @@
+buildscript {
+    ext {
+        springBootVersion = '2.3.4.RELEASE'
+        loggerVersion = '2.11.2'
+    }
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
+    }
+}
+
+plugins {
+    id "java"
+    id "idea"
+    id "io.spring.dependency-management" version "1.0.7.RELEASE"
+}
+
+apply plugin: 'org.springframework.boot'
+
+configurations {
+    all*.exclude module: 'spring-boot-starter-logging'
+    all*.exclude module: "logback-classic"
+    all*.exclude module: "log4j"
+}
+
+group = 'com.callsign'
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = '1.8'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation ("org.springframework.boot:spring-boot-starter-web:${springBootVersion}")
+    implementation("org.springframework.boot:spring-boot-starter-actuator:${springBootVersion}")
+    //implementation("org.springframework.boot:spring-boot-starter-security:${springBootVersion}")
+    implementation("org.springframework.boot:spring-boot-starter-data-jpa:${springBootVersion}")
+
+    implementation("org.apache.logging.log4j:log4j:${loggerVersion}")
+    implementation("org.apache.logging.log4j:log4j-slf4j-impl:${loggerVersion}")
+    implementation("mysql:mysql-connector-java:8.0.20")
+    implementation("org.flywaydb:flyway-core:6.4.1")
+    implementation ('org.hibernate:hibernate-core:5.4.22.Final')
+
+    implementation("org.springframework.boot:spring-boot-starter-test:${springBootVersion}")
+    implementation('com.h2database:h2')
+    testImplementation 'org.jmockit:jmockit:1.8'
+    testImplementation 'junit:junit:4.12'
+
+}
+
+test {
+    testLogging {
+        exceptionFormat = 'full'
+    }
+    //jvmArgs "-javaagent:${classpath.find { it.name.contains("jmockit") }.absolutePath}"
+}
