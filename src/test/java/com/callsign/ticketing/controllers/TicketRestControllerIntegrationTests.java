@@ -1,7 +1,8 @@
 package com.callsign.ticketing.controllers;
 
+import com.callsign.ticketing.data.requests.JwtRequest;
 import com.callsign.ticketing.data.enums.TicketPriority;
-import com.callsign.ticketing.data.transactions.presentationlayer.TicketResponse;
+import com.callsign.ticketing.data.responses.TicketResponse;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Assert;
@@ -27,11 +28,13 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @RunWith(SpringRunner.class)
 @TestPropertySource("file:src/test/resources/test-application.properties")
-public class TicketRestControllerIntegrationUnitTests {
+public class TicketRestControllerIntegrationTests {
   private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
   private static final String GET_TICKETS = "/tickets";
   @Autowired
   private MockMvc mockMvc;
+  @Autowired
+  private AuthenticationRestController authenticationRestController;
 
   @Transactional
   @Test
@@ -79,10 +82,14 @@ public class TicketRestControllerIntegrationUnitTests {
   }
 
   private List<TicketResponse> requestAndGetResponse() throws Exception {
+    String authenticatedJwtToken = authenticationRestController.
+        createAuthenticationToken(new JwtRequest("murtaza", "murtaza")).getBody().getToken();
     MvcResult result = mockMvc.perform(
         get(GET_TICKETS)
+            .header("Authorization", "Bearer " + authenticatedJwtToken)
             .accept(MediaType.APPLICATION_JSON)
-            .contentType(MediaType.APPLICATION_JSON)).andExpect(status().isOk())
+            .contentType(MediaType.APPLICATION_JSON))
+        .andExpect(status().isOk())
         .andReturn();
 
     return OBJECT_MAPPER.readValue(result.getResponse().getContentAsString(),

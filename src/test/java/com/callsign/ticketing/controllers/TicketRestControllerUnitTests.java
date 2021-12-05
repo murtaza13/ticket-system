@@ -1,10 +1,9 @@
 package com.callsign.ticketing.controllers;
 
-import com.callsign.ticketing.data.entities.Ticket;
 import com.callsign.ticketing.data.enums.TicketPriority;
-import com.callsign.ticketing.data.transactions.businesslayer.DeliveryRecord;
-import com.callsign.ticketing.data.transactions.businesslayer.TicketRecord;
-import com.callsign.ticketing.data.transactions.presentationlayer.TicketResponse;
+import com.callsign.ticketing.data.transactions.DeliveryRecord;
+import com.callsign.ticketing.data.transactions.TicketRecord;
+import com.callsign.ticketing.data.responses.TicketResponse;
 import com.callsign.ticketing.services.TicketService;
 import mockit.Expectations;
 import mockit.Mocked;

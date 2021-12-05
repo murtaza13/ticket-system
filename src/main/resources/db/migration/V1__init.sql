@@ -33,3 +33,5 @@ create table ticket(
                        primary key (ticket_id),
                        unique key delivery_reason (delivery_id, reason_type)
 );
+
+insert into user_info (user_id, user_name, password) values (1, 'murtaza', '$2a$10$NObUlRIbtukiZqWzb94fXOgFRHQeJNeek1pe6eAm6sOYqHbtDSHw2');

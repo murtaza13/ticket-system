@@ -10,7 +10,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.data.domain.Sort;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -38,7 +37,7 @@ public class DeliveryMonitoringScheduledJobIntegrationTests {
   @Sql("file:src/test/resources/TicketsCreationForDeliveriesWithSingleReason.sql")
   //@Test
   public void testTicketsCreationForDeliveriesWithSingleReason(){
-    final String reason = estimatedTimeOFDeliveryGreaterThanExpectedTime.getEvaluatorId();
+    final String reason = estimatedTimeOFDeliveryGreaterThanExpectedTime.getReasonId();
     deliveryMonitoringScheduledJob.runJob();
     List<Ticket> allTickets = ticketRepository.findAll();
     Map<Delivery, Ticket> map = allTickets.stream().collect(toMap(Ticket::getDelivery, ticket -> ticket));

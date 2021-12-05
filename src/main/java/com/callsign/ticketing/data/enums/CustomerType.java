@@ -1,5 +1,8 @@
 package com.callsign.ticketing.data.enums;
 
+/**
+ * Representation of possible types of Customers
+ */
 public enum CustomerType {
   VIP(TicketPriority.HIGH),
   LOYAL(TicketPriority.MEDIUM),

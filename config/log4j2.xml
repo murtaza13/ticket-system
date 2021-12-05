@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="WARN" monitorInterval="60">
+    <Properties>
+        <Property name="LOG_PATH">/var/log/ticketing</Property>
+        <Property name="SERVICE_ROLLING_FILE">ticketing</Property>
+        <Property name="LOG_PATTERN">%d{yyyy-MM-dd HH:mm:ss.SSSXXX} %logger %-5level [%X{account}] [%t] [%X{context}] %X{version} %msg%n</Property>
+    </Properties>
+    <Appenders>
+        <Console name="console" target="SYSTEM_OUT">
+            <PatternLayout pattern="%d{dd-MM-yyyy HH:mm:ss.SSS} [%thread] %-5level %logger.%M - %msg%n"/>
+        </Console>
+        <RollingFile name="serviceRollingFile" fileName="${LOG_PATH}/${SERVICE_ROLLING_FILE}.log"
+                     filePattern="${LOG_PATH}/${SERVICE_ROLLING_FILE}.%i.log">
+            <PatternLayout pattern="${LOG_PATTERN}"/>
+            <Policies>
+                <!-- Causes a rollover if the log file is bigger that 10 MB -->
+                <SizeBasedTriggeringPolicy size="10 MB"/>
+            </Policies>
+            <!-- Allows creation of maximum 94 roll over log files along with 1 active log file.  -->
+            <DefaultRolloverStrategy max="94"/>
+        </RollingFile>
+    </Appenders>
+    <Loggers>
+        <Logger name="com.callsign.ticketing.jobs" additivity="false" level="DEBUG">
+            <AppenderRef ref="serviceRollingFile"/>
+        </Logger>
+        <Root level="WARN" additivity="false">
+            <AppenderRef ref="serviceRollingFile"/>
+        </Root>
+    </Loggers>
+</Configuration>

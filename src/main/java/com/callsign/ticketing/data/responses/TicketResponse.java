@@ -1,7 +1,10 @@
-package com.callsign.ticketing.data.transactions.presentationlayer;
+package com.callsign.ticketing.data.responses;
 
 import com.callsign.ticketing.data.enums.TicketPriority;
 
+/**
+ * Class representing outgoing response for ticket fetch request
+ */
 public class TicketResponse {
   private Long ticketId;
   private Long deliveryId;
