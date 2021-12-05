@@ -8,10 +8,10 @@ RUN yum install -y git
 RUN echo git --version
 
 WORKDIR /opt
-RUN git clone https://murtaza13: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@github.com/murtaza13/ticket-system.git
+RUN git clone https://murtaza13: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@github.com/murtaza13/ticket-system.git
 WORKDIR /opt/ticket-system
 
 RUN ls -l
 RUN chmod +x gradlew
 RUN ./gradlew -v build
-RUN ./gradlew bootrun
+RUN ./gradlew -v bootrun
