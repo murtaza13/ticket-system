@@ -15,6 +15,6 @@ public enum CustomerType {
   }
 
   public TicketPriority getTicketPriority() {
-    return ticketPriority;
+    return this.ticketPriority;
   }
 }
