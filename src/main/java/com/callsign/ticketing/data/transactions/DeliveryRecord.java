@@ -1,15 +1,11 @@
-package com.callsign.ticketing.data.transactions.businesslayer;
+package com.callsign.ticketing.data.transactions;
 
-import com.callsign.ticketing.data.entities.Restaurant;
-import com.callsign.ticketing.data.entities.Ticket;
 import com.callsign.ticketing.data.enums.CustomerType;
 import com.callsign.ticketing.data.enums.DeliveryStatus;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 public class DeliveryRecord {
   private Long deliveryId;

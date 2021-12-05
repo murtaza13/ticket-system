@@ -1,10 +1,7 @@
 package com.callsign.ticketing.evaluators;
 
-import com.callsign.ticketing.data.entities.Delivery;
-import com.callsign.ticketing.data.entities.Restaurant;
-import com.callsign.ticketing.data.transactions.businesslayer.DeliveryRecord;
+import com.callsign.ticketing.data.transactions.DeliveryRecord;
 import com.callsign.ticketing.tickets.EstimatedTimeOFDeliveryGreaterThanExpectedTime;
-import com.callsign.ticketing.tickets.ExpectedTimeOfDeliveryPassedTicketConditionEvaluator;
 import org.junit.Assert;
 import org.junit.Test;
 

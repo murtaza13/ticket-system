@@ -3,7 +3,7 @@ package com.callsign.ticketing.services;
 import com.callsign.ticketing.data.enums.TicketPriority;
 import com.callsign.ticketing.data.repositories.DeliveryRepository;
 import com.callsign.ticketing.data.repositories.RestaurantRepository;
-import com.callsign.ticketing.data.transactions.businesslayer.TicketRecord;
+import com.callsign.ticketing.data.transactions.TicketRecord;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;

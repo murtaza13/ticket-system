@@ -4,7 +4,7 @@ import com.callsign.ticketing.configurations.EmptyContext;
 import com.callsign.ticketing.data.enums.CustomerType;
 import com.callsign.ticketing.data.enums.DeliveryStatus;
 import com.callsign.ticketing.data.enums.TicketPriority;
-import com.callsign.ticketing.data.transactions.businesslayer.DeliveryRecord;
+import com.callsign.ticketing.data.transactions.DeliveryRecord;
 import com.callsign.ticketing.services.DeliveryService;
 import com.callsign.ticketing.services.TicketService;
 import com.callsign.ticketing.tickets.DeliveryStatusNotChangedFromReceivedFor10Minutes;
@@ -14,6 +14,7 @@ import com.callsign.ticketing.tickets.TicketConditionEvaluator;
 import mockit.Expectations;
 import mockit.Mocked;
 import mockit.Verifications;
+import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.context.ApplicationContext;
 import org.springframework.test.context.ContextConfiguration;
@@ -25,11 +26,12 @@ import java.util.*;
 public class DeliveryMonitoringScheduledJobUnitTests {
 
   @Test
-  public void testNoDeliveriesCreateNoTickets(@Mocked DeliveryService deliveryService, @Mocked TicketService ticketService,
+  public void testNoDeliveriesCreateNoTickets(@Mocked DeliveryService deliveryService,
+                                              @Mocked TicketService ticketService,
                                               @Mocked ApplicationContext applicationContext) {
     new Expectations() {{
-      deliveryService.getNInCompleteDeliveries(anyInt);
-      result = new HashSet<>();
+      deliveryService.getNUnDeliveredDeliveryRecordsWithUpdateLock(anyInt);
+      result = new ArrayList<>();
     }};
 
     setApplicationContextExpectation(applicationContext);
@@ -52,12 +54,11 @@ public class DeliveryMonitoringScheduledJobUnitTests {
   public void testSingleDeliveryButNotQualifiedCreateNoTickets(@Mocked DeliveryService deliveryService,
                                                                @Mocked TicketService ticketService,
                                                                @Mocked ApplicationContext applicationContext) {
-    DeliveryRecord deliveryRecord = getDeliveryRecord(100, 100,
-        100, LocalDateTime.now().plusSeconds(1000));
+    DeliveryRecord deliveryRecord = getDeliveryRecord( LocalDateTime.now().plusSeconds(1000), CustomerType.VIP);
 
     new Expectations() {{
-      deliveryService.getNInCompleteDeliveries(anyInt);
-      result = Collections.singleton(deliveryRecord);
+      deliveryService.getNUnDeliveredDeliveryRecordsWithUpdateLock(anyInt);
+      result = Collections.singletonList(deliveryRecord);
     }};
 
     setApplicationContextExpectation(applicationContext);
@@ -80,12 +81,11 @@ public class DeliveryMonitoringScheduledJobUnitTests {
   public void testSingleDeliveryButQualifiedForSingleReasonSingleTicketCreated(@Mocked DeliveryService deliveryService,
                                                                                @Mocked TicketService ticketService,
                                                                                @Mocked ApplicationContext applicationContext) {
-    DeliveryRecord deliveryRecord = getDeliveryRecord(100, 100,
-        100, LocalDateTime.now().plusSeconds(100));
+    DeliveryRecord deliveryRecord = getDeliveryRecord(LocalDateTime.now().plusSeconds(100), CustomerType.VIP);
 
     new Expectations() {{
-      deliveryService.getNInCompleteDeliveries(anyInt);
-      result = Collections.singleton(deliveryRecord);
+      deliveryService.getNUnDeliveredDeliveryRecordsWithUpdateLock(anyInt);
+      result = Collections.singletonList(deliveryRecord);
     }};
 
     setApplicationContextExpectation(applicationContext);
@@ -104,15 +104,86 @@ public class DeliveryMonitoringScheduledJobUnitTests {
     }};
   }
 
-  private DeliveryRecord getDeliveryRecord(int currentDistanceFromDestination, int secondsToReachDestination,
-                                           int restaurantsMeanTimeToPrepareFood, LocalDateTime expectedDeliveryTime) {
+  @Test
+  public void testPriorityOfTicketGetsOverriddenCauseCustomerHasGreaterPriority(@Mocked DeliveryService deliveryService,
+                                                                               @Mocked TicketService ticketService,
+                                                                               @Mocked ApplicationContext applicationContext) {
+    DeliveryRecord deliveryRecord = getDeliveryRecord(LocalDateTime.now().plusSeconds(100), CustomerType.VIP);
+
+    new Expectations() {{
+      deliveryService.getNUnDeliveredDeliveryRecordsWithUpdateLock(anyInt);
+      result = Collections.singletonList(deliveryRecord);
+    }};
+
+    setApplicationContextExpectation(applicationContext);
+
+    DeliveryMonitoringScheduledJob deliveryMonitoringScheduledJob = new DeliveryMonitoringScheduledJob(
+        deliveryService,
+        ticketService,
+        applicationContext
+    );
+
+    deliveryMonitoringScheduledJob.runJob();
+
+    new Verifications() {{
+      String reason;
+      TicketPriority priority;
+      Long id;
+
+      ticketService.createTicket(reason = withCapture(), priority = withCapture(), id = withCapture());
+      Assert.assertEquals(TicketPriority.HIGH, priority);
+      Assert.assertEquals("ESTIMATED_TIME_OF_DELIVERY_GREATER_THAN_EXPECTED_TIME", reason);
+      Assert.assertEquals(Long.valueOf(1), id);
+      times = 1;
+    }};
+  }
+
+  @Test
+  public void testPriorityOfTicketDoesNotGetOverriddenCauseReasonHasGreaterPriorityWithMultipleTicketCreation(
+      @Mocked DeliveryService deliveryService,
+      @Mocked TicketService ticketService,
+      @Mocked ApplicationContext applicationContext) {
+    DeliveryRecord deliveryRecord = getDeliveryRecord(LocalDateTime.now().minusSeconds(100), CustomerType.NEW);
+
+    new Expectations() {{
+      deliveryService.getNUnDeliveredDeliveryRecordsWithUpdateLock(anyInt);
+      result = Collections.singletonList(deliveryRecord);
+    }};
+
+    setApplicationContextExpectation(applicationContext);
+
+    DeliveryMonitoringScheduledJob deliveryMonitoringScheduledJob = new DeliveryMonitoringScheduledJob(
+        deliveryService,
+        ticketService,
+        applicationContext
+    );
+
+    deliveryMonitoringScheduledJob.runJob();
+
+    new Verifications() {{
+      List<String> reason = new ArrayList<>();
+      List<TicketPriority> priority = new ArrayList<>();
+      List<Long> id = new ArrayList<>();
+
+      ticketService.createTicket(withCapture(reason), withCapture(priority), withCapture(id));
+      Assert.assertEquals(TicketPriority.MEDIUM, priority.get(0));
+      Assert.assertEquals("ESTIMATED_TIME_OF_DELIVERY_GREATER_THAN_EXPECTED_TIME", reason.get(0));
+      Assert.assertEquals(Long.valueOf(1), id.get(0));
+
+      Assert.assertEquals(TicketPriority.HIGH, priority.get(1));
+      Assert.assertEquals("EXPECTED_TIME_OF_DELIVERY_PASSED", reason.get(1));
+      Assert.assertEquals(Long.valueOf(1), id.get(1));
+    }};
+  }
+
+  private DeliveryRecord getDeliveryRecord(LocalDateTime expectedDeliveryTime, CustomerType customerType) {
     DeliveryRecord deliveryRecord = new DeliveryRecord();
     deliveryRecord.setDeliveryId(1L);
-    deliveryRecord.setCustomerType(CustomerType.VIP);
+    deliveryRecord.setCustomerType(customerType);
     deliveryRecord.setDeliveryStatus(DeliveryStatus.RECEIVED);
-    deliveryRecord.setCurrentDistanceFromDestinationInMetres(currentDistanceFromDestination);
-    deliveryRecord.setTimeToReachDestinationInSeconds(secondsToReachDestination);
-    deliveryRecord.setRestaurantsMeanTimetoPrepareFood(restaurantsMeanTimeToPrepareFood);
+    deliveryRecord.setCurrentDistanceFromDestinationInMetres(100);
+    deliveryRecord.setTimeToReachDestinationInSeconds(100);
+    deliveryRecord.setRestaurantsMeanTimetoPrepareFood(100);
     deliveryRecord.setExpectedDeliveryTime(expectedDeliveryTime);
     deliveryRecord.setCreatedAt(LocalDateTime.now());
     deliveryRecord.setTickets(new ArrayList<>());

@@ -1,4 +1,4 @@
-package com.callsign.ticketing.data.transactions.businesslayer;
+package com.callsign.ticketing.data.transactions;
 
 import com.callsign.ticketing.data.enums.TicketPriority;
 

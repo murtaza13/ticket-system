@@ -1,8 +1,7 @@
 package com.callsign.ticketing.tickets;
 
-import com.callsign.ticketing.data.entities.Delivery;
 import com.callsign.ticketing.data.enums.TicketPriority;
-import com.callsign.ticketing.data.transactions.businesslayer.DeliveryRecord;
+import com.callsign.ticketing.data.transactions.DeliveryRecord;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
@@ -10,7 +9,7 @@ import java.time.LocalDateTime;
 @Component
 public class EstimatedTimeOFDeliveryGreaterThanExpectedTime implements TicketConditionEvaluator {
   @Override
-  public String getEvaluatorId() {
+  public String getReasonId() {
     return "ESTIMATED_TIME_OF_DELIVERY_GREATER_THAN_EXPECTED_TIME";
   }
 
