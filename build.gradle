@@ -49,13 +49,10 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-test:${springBootVersion}")
     implementation('com.h2database:h2')
     testImplementation 'org.jmockit:jmockit:1.8'
-    testImplementation 'junit:junit:4.12'
-
 }
 
 test {
     testLogging {
         exceptionFormat = 'full'
     }
-    //jvmArgs "-javaagent:${classpath.find { it.name.contains("jmockit") }.absolutePath}"
 }
