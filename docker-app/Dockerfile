@@ -14,4 +14,4 @@ WORKDIR /opt/ticket-system
 RUN ls -l
 RUN chmod +x gradlew
 RUN ./gradlew -v build
-RUN ./gradlew bootrun
+RUN ./gradlew -v bootrun
