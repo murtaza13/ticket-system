@@ -14,9 +14,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -49,7 +47,7 @@ public class DeliveryMonitoringScheduledJob {
   public void runJob() {
     List<DeliveryRecord> deliveries = deliveryService.getNUnDeliveredDeliveryRecordsWithUpdateLock(100);
     LOGGER.debug("Picked up {} deliveries for evaluation process.", deliveries.size());
-    Set<TicketConditionEvaluator> conditionEvaluators = new HashSet<>(applicationContext.getBeansOfType(
+    List<TicketConditionEvaluator> conditionEvaluators = new ArrayList<>(applicationContext.getBeansOfType(
         TicketConditionEvaluator.class).values());
     LOGGER.debug("Found {} TicketConditionEvaluators to evaluate deliveries against.", conditionEvaluators.size());
 

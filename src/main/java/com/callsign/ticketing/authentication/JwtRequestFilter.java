@@ -35,30 +35,32 @@ public class JwtRequestFilter extends OncePerRequestFilter {
   @Override
   protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
       throws ServletException, IOException {
-    String username = null;
-    Optional<String> jwtToken = getJwtTokenFromRequest(request);
-    // JWT Token is in the form "Bearer token". Remove Bearer word and get
-    // only the Token
-    if (jwtToken.isPresent()) {
-      String token = jwtToken.get();
-      username = jwtTokenUtil.getUsernameFromToken(jwtToken.get());
-      LOGGER.debug("Found a valid JWT Token. For user: {}", username);
-      if(username != null && SecurityContextHolder.getContext().getAuthentication() == null){
-        UserDetails userDetails = this.userDetailsService.loadUserByUsername(username);
+    if(!request.getRequestURI().equals("/authenticate")) {
+      String username = null;
+      Optional<String> jwtToken = getJwtTokenFromRequest(request);
+      // JWT Token is in the form "Bearer token". Remove Bearer word and get
+      // only the Token
+      if (jwtToken.isPresent()) {
+        String token = jwtToken.get();
+        username = jwtTokenUtil.getUsernameFromToken(jwtToken.get());
+        LOGGER.debug("Found a valid JWT Token. For user: {}", username);
+        if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+          UserDetails userDetails = this.userDetailsService.loadUserByUsername(username);
 
-        // if token is valid configure Spring Security to manually set
-        // authentication
-        if (jwtTokenUtil.validateToken(token, userDetails)) {
+          // if token is valid configure Spring Security to manually set
+          // authentication
+          if (jwtTokenUtil.validateToken(token, userDetails)) {
 
-          UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(
-              userDetails, null, userDetails.getAuthorities());
-          usernamePasswordAuthenticationToken
-              .setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-          // After setting the Authentication in the context, we specify
-          // that the current user is authenticated. So it passes the
-          // Spring Security Configurations successfully.
-          SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
-          LOGGER.debug("Successfully validate JWT token for user: {}", username);
+            UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(
+                userDetails, null, userDetails.getAuthorities());
+            usernamePasswordAuthenticationToken
+                .setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+            // After setting the Authentication in the context, we specify
+            // that the current user is authenticated. So it passes the
+            // Spring Security Configurations successfully.
+            SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
+            LOGGER.debug("Successfully validate JWT token for user: {}", username);
+          }
         }
       }
     }

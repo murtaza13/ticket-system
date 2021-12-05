@@ -24,6 +24,12 @@
         <Logger name="com.callsign.ticketing.jobs" additivity="false" level="DEBUG">
             <AppenderRef ref="serviceRollingFile"/>
         </Logger>
+        <Logger name="com.callsign.ticketing.services" additivity="false" level="DEBUG">
+            <AppenderRef ref="serviceRollingFile"/>
+        </Logger>
+        <Logger name="com.callsign.ticketing" additivity="false" level="INFO">
+            <AppenderRef ref="serviceRollingFile"/>
+        </Logger>
         <Root level="WARN" additivity="false">
             <AppenderRef ref="serviceRollingFile"/>
         </Root>
