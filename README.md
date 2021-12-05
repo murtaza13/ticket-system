@@ -1,4 +1,4 @@
-#How to Run
+# How to Run
 
 ## Pre-Requisites
 1. Java 8+ should be installed on the system
