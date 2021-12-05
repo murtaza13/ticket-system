@@ -25,7 +25,9 @@
 ### 3. Import project and run docker-container
 #### Steps:
      1. Clone the project from github repository `https://github.com/murtaza13/ticket-system`
-     2. Move to `docker-app` and run `docker-compose up` in command line.
+     2. Move to `docker-app` and open the Dockerfile
+     3. Within the Dockerfile insert your github username and password in the git clone command on line# 11.
+     3. Run `docker-compose up` in command line.
      3. Given the docker deamon is up and running the application should start.
      
 ### 4. Import project and run using gradle wrapper
