@@ -8,7 +8,7 @@ RUN yum install -y git
 RUN echo git --version
 
 WORKDIR /opt
-RUN git clone https://murtaza13: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@github.com/murtaza13/ticket-system.git
+RUN git clone https://[INSER USERNAME HERE]:[INSERT API KEY HERE]@github.com/murtaza13/ticket-system.git
 WORKDIR /opt/ticket-system
 
 RUN ls -l
