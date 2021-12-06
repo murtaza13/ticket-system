@@ -1,5 +1,5 @@
 ### How to interact with the application?
-The application exposes two basic endpoints
+The application by default runs on port 8443 and exposes following endpoints
 
 1. `/authenticate` As the name suggests, this endpoint is used to authenticate a user based on
     username and password. This is a HTTP.POST requests and expects two parameters in the request body, 

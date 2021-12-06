@@ -47,8 +47,8 @@ dependencies {
     implementation ('org.hibernate:hibernate-core:5.4.22.Final')
 
     implementation("org.springframework.boot:spring-boot-starter-test:${springBootVersion}")
-    implementation('com.h2database:h2')
-    testImplementation 'org.jmockit:jmockit:1.8'
+    implementation("com.h2database:h2")
+    testImplementation ("org.jmockit:jmockit:1.8")
 }
 
 test {
